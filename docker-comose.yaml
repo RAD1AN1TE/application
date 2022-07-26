@@ -1,0 +1,13 @@
+
+
+services:
+  users_db:
+
+    image: postgres
+    environment:
+      POSTGRES_DB: "userdata"
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "password"
+    ports:
+      - "5432:5432"
+
