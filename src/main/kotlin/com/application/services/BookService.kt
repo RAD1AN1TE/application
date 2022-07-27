@@ -1,15 +1,16 @@
 package com.application.services
 
 import com.application.data.Book
+import com.application.data.BookEntity
 
 
 interface BookService {
 
-    suspend fun getBooks():Iterable<Book>
-    suspend fun getOwnedBooks(): Iterable<Book>
-    suspend fun getUnOwnedBooks(): Iterable<Book>
-    suspend fun editBook(bookId: Int, book: Book): Int
-    suspend fun addBook(book: Book)
-    suspend fun deleteBook(bookId: Int) : Int
+    fun getBooks():Iterable<BookEntity>
+    fun getOwnedBooks(): Iterable<BookEntity>
+    fun getUnOwnedBooks(): Iterable<BookEntity>
+    fun editBook( book: BookEntity ): BookEntity
+    fun addBook(book: BookEntity): BookEntity
+    fun deleteBook(bookId: Int) : Int
 
 }

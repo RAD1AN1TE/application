@@ -1,6 +1,7 @@
 package com.application.routes
 
 import com.application.data.Book
+import com.application.data.BookEntity
 import com.application.services.BookService
 import io.ktor.application.*
 import io.ktor.features.*
@@ -34,15 +35,15 @@ fun Application.bookRoutes(){
             }
 
             post("book/new"){
-                val bookRequest = call.receive<Book>()
+                val bookRequest = call.receive<BookEntity>()
                 bookService.addBook(bookRequest)
                 call.respond(HttpStatusCode.Accepted)
             }
 
             post("book/{id}/edit"){
                 val bookId = call.parameters["id"]?.toIntOrNull()?:throw NotFoundException()
-                val bookRequest = call.receive<Book>()
-                bookService.editBook(bookId, bookRequest)
+                val bookRequest = call.receive<BookEntity>()
+                bookService.editBook(bookRequest)
                 call.respond(HttpStatusCode.Accepted)
             }
 

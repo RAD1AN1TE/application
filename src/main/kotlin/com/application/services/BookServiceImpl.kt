@@ -1,6 +1,7 @@
 package com.application.services
 
 import com.application.data.Book
+import com.application.data.BookEntity
 import com.application.data.Books
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -10,8 +11,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 class BookServiceImpl(private val db: Database) : BookService {
 
 
-
-    private fun toBook(row: ResultRow) = Book(
+    private fun toBook(row: ResultRow) = BookEntity(
         bookId = row[Books.bookId],
         title = row[Books.title],
         author = row[Books.author],
@@ -22,26 +22,27 @@ class BookServiceImpl(private val db: Database) : BookService {
     )
 
 
-    override suspend fun getBooks(): Iterable<Book> = transaction(db){
+    override fun getBooks(): Iterable<BookEntity> = transaction(db){
 
         Books.selectAll().map(::toBook)
 
+
     }
 
-    override suspend fun getOwnedBooks(): Iterable<Book> = transaction(db) {
+    override fun getOwnedBooks(): Iterable<BookEntity> = transaction(db) {
 
         Books.select{  Books.owned eq true }.map(::toBook)
 
     }
 
-    override suspend fun getUnOwnedBooks(): Iterable<Book> = transaction(db) {
+    override fun getUnOwnedBooks(): Iterable<BookEntity> = transaction(db) {
 
         Books.select{  Books.owned eq false }.map(::toBook)
 
     }
 
 
-    override suspend fun addBook(book: Book): Unit = transaction(db){
+    override fun addBook(book: BookEntity): BookEntity = transaction(db){
 
         Books.insert{
             it[this.title] = book.title
@@ -50,21 +51,21 @@ class BookServiceImpl(private val db: Database) : BookService {
             it[this.owned] = book.owned
             it[this.isbn] = book.isbn
             it[this.about] = book.about
-
         }
+        book
     }
 
-    override suspend fun editBook(bookId:Int, book: Book): Int = transaction(db) {
+    override fun editBook(book: BookEntity): BookEntity = transaction(db) {
 
-       Books.update({Books.bookId eq bookId}){
-           it[this.title] = book.title
-           it[this.author]  = book.author
-           it[this.owned] = book.owned
-
+       Books.update({Books.bookId eq book.bookId!!}){
+           it[title] = book.title
+           it[author]  = book.author
+           it[owned] = book.owned
        }
+        book
     }
 
-    override suspend fun deleteBook(bookId:Int) : Int = transaction(db) {
+    override fun deleteBook(bookId:Int) : Int = transaction(db) {
 
         Books.deleteWhere { Books.bookId eq bookId }
 

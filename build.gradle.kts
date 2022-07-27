@@ -46,16 +46,15 @@ dependencies {
     implementation("org.postgresql:postgresql:42.3.6")
 
     implementation("com.zaxxer:HikariCP:2.7.8")
-    implementation("junit:junit:4.13.1")
-
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.6.8")
     ksp ("io.insert-koin:koin-ksp-compiler:1.6.10-1.0.2")
 
     testImplementation(kotlin("test"))
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.4.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.4.2")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.4.2")
     testImplementation("org.mockito:mockito-junit-jupiter:4.6.1")
-
 }
 
 tasks.test {

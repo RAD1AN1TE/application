@@ -1,119 +1,74 @@
 package com.application.services
-//
-//import com.application.data.Book
-//import com.application.data.Books
-//import org.jetbrains.exposed.sql.Database
-//import org.jetbrains.exposed.sql.ResultRow
-//import org.junit.jupiter.api.Assertions.assertAll
-//import org.junit.jupiter.api.Assertions.assertEquals
-//import org.junit.jupiter.api.Test
-//
-//import org.junit.jupiter.api.BeforeAll
-//import org.junit.jupiter.api.BeforeEach
-////import org.junit.jupiter.api.assertAll
-//import org.mockito.Mock
-//import org.mockito
-//
-//
-//
-//internal class BookServiceImplTest {
-//
-////    private var mockBookService: BookService? = null
-////
-////    @BeforeAll
-////    fun beforeAll(){
-////        mockBookService = Mockito.mock( BookService::class.java)
-////    }
-//
-//    @Mock
-//    private var mockBookService : BookService? = null
-//    @Mock
-//    private var database : Database? = null
-//    @Mock
-//    private var book : Book? = null
-//    @Mock
-//    private var row : ResultRow? = null
-//
-//
-//    List<>
-//    @BeforeAll
-//    fun setUp(){
-//
-//        when(book!!.bookId).thenReturn(1)
-//        when(book!!.title).thenReturn("valorant")
-//        when(book!!.author).thenReturn("jett")
-//        when(book!!.genre).thenReturn("fiction")
-//        when(book!!.isbn).thenReturn("123-456")
-//        when(book!!.owned).thenReturn(true)
-//        when(book!!.about).thenReturn("good book on science")
-//
-//        when(row!![Books.bookId]).thenReturn("1")
-//        when(row!![Books.title]).thenReturn("valorant")
-//        when(row!![Books.author]).thenReturn("jett")
-//        when(row!![Books.genre]).thenReturn("fiction")
-//        when(row!![Books.isbn]).thenReturn("123-456")
-//        when(row!![Books.owned]).thenReturn(true)
-//        when(row!![Books.about]).thenReturn("good book on science")
+
+import com.application.data.BookEntity
+import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.assertEquals
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
+@DisplayName("BookServiceImpl Test")
+public class BookServiceImplTest {
+
+    private var bookId: Int = 1
+    private var bookEntity: BookEntity? = null
+    private var bookService: BookServiceImpl? = null
+    private var dummyData = DummyData()
+    private val datasource = dummyData.createDataSource()
+    private val database = dummyData.provideDatabase(datasource)
+
+
+
+    init{
+        dummyData.initDB(database)
+        bookEntity = dummyData.dummyBookEntity
+        bookService = BookServiceImpl(database)
+    }
+
+//    @AfterClass
+//    fun afterAll(){
+//        bookEntity = null
+//        bookService = null
 //    }
-//
-//
-//    @Test
-//    fun testToBooks(){
-//        var books : Book? = null
-//        books?.bookId = 1
-//        books?.title = "valorant"
-//        books?.author = "jett"
-//        books?.genre =  "fiction"
-//        books?.isbn = "123-456"
-//        books?.owned = true
-//        books?.about = "good book on science"
-//
-//        assertAll(
-//
-//
-//        )
-//        assertEquals(books!!.bookId, row!![Books.bookId])
-//        assertEquals(books!!.title, row!![Books.title])
-//        assertEquals(books!!.author, row!![Books.author])
-//        assertEquals(books!!.genre, row!![Books.genre])
-//        assertEquals(books!!.isbn, row!![Books.isbn])
-//        assertEquals(books!!.owned, row!![Books.owned])
-//        assertEquals(books!!.about, row!![Books.about])
-//
-//
-//
-//        println("Success")
-//
-//    }
-//
-////    @Test
-////    fun getBooks() {
-////        var books = Books()
-////    }
-//
-//    @Test
-//    fun getOwnedBooks() {
-//
-//    }
-//
-//    @Test
-//    fun getUnOwnedBooks() {
-//
-//    }
-//
-//    @Test
-//    fun addBook() {
-//
-//    }
-//
-//    @Test
-//    fun editBook() {
-//
-//    }
-//
-//    @Test
-//    fun deleteBook() {
-//
-//    }
-//
-//}
+
+    @Test
+    fun testGetBooks() {
+        val actual = bookService!!.getBooks()
+
+        assertEquals(4, actual.first().bookId)
+    }
+
+    @Test
+    fun testGetOwnedBooks() {
+        val actual = bookService!!.getOwnedBooks()
+        assertEquals(true, actual.first().owned)
+    }
+
+    @Test
+    fun getUnOwnedBooks() {
+        val actual = bookService!!.getUnOwnedBooks()
+        assertEquals(false, actual.first().owned)
+    }
+
+    @Test
+    fun testAddBook() {
+        val actual = bookService!!.addBook(bookEntity!!)
+        bookId = actual.bookId!!
+        assertEquals(bookEntity!!.copy(bookId=bookId),actual)
+
+    }
+
+//    @DisplayName("On edit it will edit the book entity in table")
+//    @Order(1)
+    @Test
+    fun testEditBook() {
+        val actual = bookService!!.editBook(bookEntity!!.copy(bookId = 1, author = "TEJ"))
+        assertEquals(bookEntity!!.copy(bookId=1, author = "TEJ"), actual)
+    }
+
+    @Test
+//    @DisplayName("On delete it will delete the row in table")
+    suspend fun testDeleteBook() {
+        val actualValue = bookService!!.deleteBook(bookId)
+        assertEquals(1,actualValue)
+    }
+}
