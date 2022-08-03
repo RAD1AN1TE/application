@@ -13,7 +13,7 @@ import javax.sql.DataSource
 const val HIKARI = "ktor.hikariconfig"
 
 
-object DbConnection : KoinComponent{
+object DbConnection {
 
     val dataSource = createDataSource()
     val dataBase = provideDatabase(dataSource)
@@ -43,7 +43,7 @@ fun Application.initDB(){
     val database = DbConnection.dataBase
 
     transaction(database) {
-        SchemaUtils.createMissingTablesAndColumns(Books)
+        SchemaUtils.create(Books)
     }
 
 }

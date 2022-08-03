@@ -15,29 +15,34 @@ class BookServiceImpl(private val db: Database) : BookService {
         bookId = row[Books.bookId],
         title = row[Books.title],
         author = row[Books.author],
-        genre = row[Books.genre],
-        isbn = row[Books.isbn],
-        owned = row[Books.owned],
-        about = row[Books.about]
+//        genre = row[Books.genre],
+//        isbn = row[Books.isbn],
+        owned = row[Books.owned]
+//        about = row[Books.about]
     )
 
 
     override fun getBooks(): Iterable<BookEntity> = transaction(db){
 
-        Books.selectAll().map(::toBook)
-
+        Books.selectAll().orderBy((Books.columns.find {
+            it.name == "bookId"
+        } ?: Books.bookId) to SortOrder.ASC).map(::toBook)
 
     }
 
     override fun getOwnedBooks(): Iterable<BookEntity> = transaction(db) {
 
-        Books.select{  Books.owned eq true }.map(::toBook)
+        Books.select{  Books.owned eq true }.orderBy((Books.columns.find {
+            it.name == "bookId"
+        } ?: Books.bookId) to SortOrder.ASC).map(::toBook)
 
     }
 
     override fun getUnOwnedBooks(): Iterable<BookEntity> = transaction(db) {
 
-        Books.select{  Books.owned eq false }.map(::toBook)
+        Books.select{  Books.owned eq false }.orderBy((Books.columns.find {
+            it.name == "bookId"
+        } ?: Books.bookId) to SortOrder.ASC).map(::toBook)
 
     }
 
@@ -45,12 +50,11 @@ class BookServiceImpl(private val db: Database) : BookService {
     override fun addBook(book: BookEntity): BookEntity = transaction(db){
 
         Books.insert{
+            it[this.bookId] = book.bookId
             it[this.title] = book.title
             it[this.author] = book.author
-            it[this.genre] = book.genre
             it[this.owned] = book.owned
-            it[this.isbn] = book.isbn
-            it[this.about] = book.about
+
         }
         book
     }
@@ -62,6 +66,7 @@ class BookServiceImpl(private val db: Database) : BookService {
            it[author]  = book.author
            it[owned] = book.owned
        }
+
         book
     }
 
